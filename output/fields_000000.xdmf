@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<Xdmf Version="2.0">
+  <Domain>
+    <Grid Name="cavity" GridType="Uniform">
+      <Topology TopologyType="2DCoRectMesh" Dimensions="128 128"/>
+      <Geometry GeometryType="ORIGIN_DXDY">
+        <DataItem Dimensions="2" Format="XML">0 0</DataItem>
+        <DataItem Dimensions="2" Format="XML">1 1</DataItem>
+      </Geometry>
+      <Attribute Name="rho" AttributeType="Scalar" Center="Node">
+        <DataItem Dimensions="128 128" NumberType="Float" Precision="8" Format="HDF">fields_000000.h5:/rho</DataItem>
+      </Attribute>
+      <Attribute Name="ux" AttributeType="Scalar" Center="Node">
+        <DataItem Dimensions="128 128" NumberType="Float" Precision="8" Format="HDF">fields_000000.h5:/ux</DataItem>
+      </Attribute>
+      <Attribute Name="uy" AttributeType="Scalar" Center="Node">
+        <DataItem Dimensions="128 128" NumberType="Float" Precision="8" Format="HDF">fields_000000.h5:/uy</DataItem>
+      </Attribute>
+    </Grid>
+  </Domain>
+</Xdmf>
