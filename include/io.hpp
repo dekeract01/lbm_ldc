@@ -5,6 +5,6 @@
 namespace lbm {
 
     void write_h5(const grid& g, int step);   // dumps rho, ux, uy to output/fields_NNNNNN.h5
-    void write_xdmf(int step);                // XML wrapper so ParaView sees proper geometry
+    void write_xdmf(int step);                // XML wrapper so paraview sees proper geometry
 
 } // namespace lbm

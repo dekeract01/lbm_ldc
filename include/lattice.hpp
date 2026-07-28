@@ -8,7 +8,7 @@ namespace lbm {
     constexpr int q = 9;
 
     // lattice sound speed squared
-    constexpr double cs2 = 1.0 / 3.0;
+    constexpr double cs2 = 1.0/3.0;
 
     // discrete velocity vectors
     // 0: rest
@@ -52,12 +52,12 @@ namespace lbm {
 
     // 1d soa flat index helper
     inline constexpr int idx(int i, int x, int y){
-        return i * ncells + y * nx + x;
+        return i*ncells + y*nx + x;
     }
 
     // node index helper (one value per cell: rho, ux, uy)
     inline constexpr int cidx(int x, int y){
-        return y * nx + x;
+        return y*nx + x;
     }
 
 

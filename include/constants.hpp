@@ -4,7 +4,7 @@
 namespace lbm {
 
     // simulation control
-    constexpr int max_steps   = 20000;
+    constexpr int max_steps   = 40000;
     constexpr int output_freq = 1000;
 
     // grid dimensions (lattice units: dx = dt = 1)

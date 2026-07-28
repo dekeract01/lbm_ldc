@@ -1,45 +1,58 @@
-// main_.cpp :: basic LBM component test
+// main.cpp :: D2Q9 lid-driven cavity solver
 
 #include <iostream>
+#include <iomanip>
+#include <chrono>
 
 #include "constants.hpp"
 #include "lattice.hpp"
 #include "grid.hpp"
+#include "macroscopic.hpp"
+#include "equilibrium.hpp"
+#include "collision.hpp"
+#include "streaming.hpp"
+#include "boundary.hpp"
 #include "io.hpp"
 
 int main()
 {
-    std::cout << "D2Q9 LBM test\n";
-    std::cout << "Grid: " << lbm::nx << " x " << lbm::ny << "\n";
-    std::cout << "Cells: " << lbm::ncells << "\n";
-    std::cout << "Re = " << lbm::Re << "\n";
-    std::cout << "tau = " << lbm::tau << "\n";
-    std::cout << "omega = " << lbm::omega << "\n";
+    std::cout << "D2Q9 lid-driven cavity\n";
+    std::cout << "grid " << lbm::nx << " x " << lbm::ny
+              << "   Re = " << lbm::Re
+              << "   tau = " << lbm::tau << "\n\n";
 
-    std::cout << "\nD2Q9 lattice:\n";
-    for (int i = 0; i < lbm::q; i++) {
-        std::cout << i << ": c=(" << lbm::cx[i] << "," << lbm::cy[i] << ") "
-                  << "w=" << lbm::w[i] << " opp=" << lbm::opp[i] << "\n";
-    }
-
-    std::cout << "\nIndex test:\n";
-    std::cout << "idx(0,10,10) = " << lbm::idx(0, 10, 10) << "\n";
-
-    // --- build a grid and write it out ---
     lbm::grid g;
     lbm::init_rest(g);
 
-    // scribble a known pattern so ParaView shows something non-flat:
-    // ux ramps left-to-right, uy ramps bottom-to-top
-    for (int y = 0; y < lbm::ny; ++y)
-        for (int x = 0; x < lbm::nx; ++x) {
-            g.ux[lbm::cidx(x, y)] = static_cast<double>(x);
-            g.uy[lbm::cidx(x, y)] = static_cast<double>(y);
+    using clock = std::chrono::steady_clock;
+    auto t_start = clock::now();
+    auto t_prev  = t_start;
+
+    for (int step = 0; step <= lbm::max_steps; ++step) {
+        lbm::compute_moments(g);   // rho, u from f
+        lbm::collide(g);           // relax f toward equilibrium
+        lbm::stream(g);            // propagate into fnew, swap
+        lbm::apply_boundaries(g);  // fill wall holes: bounce-back + lid
+
+        if (step % lbm::output_freq == 0) {
+            lbm::write_h5(g, step);
+
+            auto now = clock::now();
+            // time for this block of steps, and MLUPS (million lattice
+            // updates per second) — the standard LBM throughput metric
+            double dt = std::chrono::duration<double>(now - t_prev).count();
+            double mlups = (lbm::output_freq * double(lbm::ncells))/(dt * 1e6);
+            double elapsed = std::chrono::duration<double>(now - t_start).count();
+
+            std::cout << "step " << std::setw(6) << step
+                      << "   " << std::fixed << std::setprecision(1)
+                      << std::setw(6) << mlups << " MLUPS"
+                      << "   elapsed " << std::setprecision(1) << elapsed << " s\n";
+
+            t_prev = now;
         }
+    }
 
-    lbm::write_h5(g, 0);
-    lbm::write_xdmf(0);
-    std::cout << "\nwrote output/fields_000000.h5\n";
-
+    std::cout << "done\n";
     return 0;
 }
