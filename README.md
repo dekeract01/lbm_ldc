@@ -22,7 +22,7 @@ expected primary vortex (core near x/L ~ 0.53, y/L ~ 0.57) together with both
 bottom-corner secondary vortices. Plots are written to the `output/` folder as
 PNG files.
 
-## Roadmap
+## Future work
 
 - **Corner treatment.** The corner nodes show minor artifacts and the contours
   there look slightly off. The interior matches Ghia, so the issue is localised,
